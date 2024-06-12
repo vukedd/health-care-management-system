@@ -1,4 +1,3 @@
-# SR08-2023-UOP
 # Health Care Java Desktop Application
 
 ## "Introduction to Object Oriented Programming" class project, second semester
