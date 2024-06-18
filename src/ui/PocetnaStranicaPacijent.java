@@ -40,7 +40,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 	private JFrame frameZakazi;
 	private JFrame frameTermin;
 	
-	private DefaultTableModel model;
+	private DefaultTableModel model3;
 	private JTable tabela;
 	private int izabranRed;
 	private JScrollPane tblTermini;
@@ -137,7 +137,7 @@ public class PocetnaStranicaPacijent extends JFrame{
                 if (text.trim().length() == 0) {
                     sorter.setRowFilter(null);
                 } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    sorter.setRowFilter(RowFilter.regexFilter(".*" + text));
                 }
             }
         });
@@ -156,6 +156,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 				tBarPacijent.remove(pretraziTab);
 				tBarPacijent.add(pretraziTab, "gap 200");
 				tBarPacijent.add(filterField);
+				filterField.setText("");
 				mainSection.add(tblTermini, "grow, push");
 				revalidate();
 				repaint();
@@ -226,6 +227,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 					tBarPacijent.remove(pretraziTab);
 					tBarPacijent.add(pretraziTab, "gap 200");
 					tBarPacijent.add(filterField);
+					filterField.setText("");
 					mainSection.add(tblTermini, "grow, push");
 					revalidate();
 					repaint();
@@ -242,6 +244,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 					tBarPacijent.remove(pretraziTab);
 					tBarPacijent.add(pretraziTab, "gap 200");
 					tBarPacijent.add(filterField);
+					filterField.setText("");
 					mainSection.add(tblTermini, "grow, push");
 					revalidate();
 					repaint();
@@ -363,8 +366,8 @@ public class PocetnaStranicaPacijent extends JFrame{
 			}
 		}
 	
-		model = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model);
+		model3 = new DefaultTableModel(sadrzaj, zaglavlja);
+		tabela = new JTable(model3);
 		
 		tabela.setRowSelectionAllowed(true);
 
@@ -439,7 +442,7 @@ public class PocetnaStranicaPacijent extends JFrame{
                     	
                     	indexTerminaZaPrikaz = 0;
                     	for (Termin t: DomZdravlja.getTermini()) {
-                    		if (t.getId() == Integer.parseInt(model.getValueAt(izabranRed, 0).toString())) {
+                    		if (t.getId() == Integer.parseInt(model3.getValueAt(izabranRed, 0).toString())) {
                     			break;
                     		}
                     		indexTerminaZaPrikaz += 1;
@@ -452,7 +455,7 @@ public class PocetnaStranicaPacijent extends JFrame{
                     	JLabel pacijentTermin = new JLabel("Pacijent: ");
                     	pacijentTermin.setFont(new Font("Bold", Font.PLAIN, 15));
                     	JLabel pacijent = null;
-                    	if (model.getValueAt(izabranRed, 2).toString().compareTo("Slobodan")== 0) {
+                    	if (model3.getValueAt(izabranRed, 2).toString().compareTo("Slobodan")== 0) {
                     		pacijent = new JLabel("/");
                     	} else {
                         	pacijent = new JLabel(DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getPacijent().getKorisnickoIme());
@@ -470,6 +473,30 @@ public class PocetnaStranicaPacijent extends JFrame{
                     	statusTermin.setFont(new Font("Bold", Font.PLAIN, 15));
                     	JLabel status = new JLabel(DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus().toString());
                     	
+                    	JButton otkaziTermin = new JButton("Otkaži Termin");
+                    	if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getDatumTermina().isAfter(LocalDateTime.now()) && DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() == Status.Zakazan) {
+                    		otkaziTermin.setEnabled(true);
+                    	} 
+                    	else {
+                    		otkaziTermin.setEnabled(false);
+                    	}
+                    	otkaziTermin.addActionListener(new ActionListener() {
+
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() == Status.Zakazan && DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getDatumTermina().isAfter(LocalDateTime.now())) {
+									int a = JOptionPane.showConfirmDialog(frameInfoTermin, "Da li ste sigurni da želite da otkažete termin?", "Potvrda", JOptionPane.YES_NO_OPTION);
+										if (a == JOptionPane.YES_OPTION) {
+											DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setStatus(Status.Otkazan);
+											model3.setValueAt("Otkazan", izabranRed, 2);
+											JOptionPane.showMessageDialog(frameInfoTermin, "Termin je uspešno otkazan!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
+											DomZdravlja.sacuvaj();
+											setEnabled(true);
+											frameInfoTermin.dispose();
+											validate();
+										}
+								}
+							}});
                     	
                     	
                     	pnlTerminInfo.add(idTermina, "gap 100");
@@ -482,6 +509,7 @@ public class PocetnaStranicaPacijent extends JFrame{
                     	pnlTerminInfo.add(datum, "wrap, gap 100");
                     	pnlTerminInfo.add(statusTermin, "gap 100");
                     	pnlTerminInfo.add(status, "wrap, gap 100");
+                    	pnlTerminInfo.add(otkaziTermin, "gap 100");
                     	
                     	
                     	frameInfoTermin.add(pnlTerminInfo,BorderLayout.CENTER);
@@ -514,7 +542,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 				
 			}});
 		
-		sorter = new TableRowSorter<>(model);
+		sorter = new TableRowSorter<>(model3);
 		tabela.setRowSorter(sorter);
 		
 		sorter.setComparator(0, new Comparator<String>() {
@@ -533,10 +561,10 @@ public class PocetnaStranicaPacijent extends JFrame{
 		JScrollPane scrollPane = new JScrollPane(tabela);
 		
 		int i = 0;
-		int velicina = model.getRowCount();
+		int velicina = model3.getRowCount();
 		while (i < velicina) {
-			if (model.getValueAt(i, 0) == null) {
-				model.removeRow(i);
+			if (model3.getValueAt(i, 0) == null) {
+				model3.removeRow(i);
 				velicina -= 1;
 			} else {
 				i++;
@@ -570,7 +598,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 					}
 				}
 				sadrzaj[i][2] = k.getKorisnickoIme();
-				sadrzaj[i][3] = info[3];
+				sadrzaj[i][3] = "...";
 			} else {
 				redovi.add(i);
 			}
@@ -748,22 +776,21 @@ public class PocetnaStranicaPacijent extends JFrame{
 			String lekar = null;
 				if (Status.values()[Integer.parseInt(info[3])] == Status.Slobodan && LocalDateTime.parse(info[4], DATE_TIME_FORMATTER).isAfter(LocalDateTime.now())) {
 					for (Korisnik k : DomZdravlja.getKorisnici()) {
-						if (k.getId() == Integer.parseInt(info[2])) {
+						if (k.getId() == Integer.parseInt(info[2]) && k.getAktivan() == true) {
 							sadrzaj[i][1] = k.getKorisnickoIme();
 							lekar = k.getKorisnickoIme();
-							break;
+							sadrzaj[i][0] = info[0];
+							sadrzaj[i][2] = Status.values()[Integer.parseInt(info[3])];
+							sadrzaj[i][3] = LocalDateTime.parse(info[4], DATE_TIME_FORMATTER);
 						}
 					}
-					sadrzaj[i][0] = info[0];
-					sadrzaj[i][2] = Status.values()[Integer.parseInt(info[3])];
-					sadrzaj[i][3] = LocalDateTime.parse(info[4], DATE_TIME_FORMATTER);
 				} else {
 					redovi.add(i);
 				}
 			}
 	
-		model = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model);
+		model3 = new DefaultTableModel(sadrzaj, zaglavlja);
+		tabela = new JTable(model3);
 		
 		tabela.setRowSelectionAllowed(true);
 
@@ -838,7 +865,7 @@ public class PocetnaStranicaPacijent extends JFrame{
                     	
                     	indexTerminaZaPrikaz = 0;
                     	for (Termin t: DomZdravlja.getTermini()) {
-                    		if (t.getId() == Integer.parseInt(model.getValueAt(izabranRed, 0).toString())) {
+                    		if (t.getId() == Integer.parseInt(model3.getValueAt(izabranRed, 0).toString())) {
                     			break;
                     		}
                     		indexTerminaZaPrikaz += 1;
@@ -851,7 +878,7 @@ public class PocetnaStranicaPacijent extends JFrame{
                     	JLabel pacijentTermin = new JLabel("Pacijent: ");
                     	pacijentTermin.setFont(new Font("Bold", Font.PLAIN, 15));
                     	JLabel pacijent = null;
-                    	if (model.getValueAt(izabranRed, 2).toString().compareTo("Slobodan")== 0) {
+                    	if (model3.getValueAt(izabranRed, 2).toString().compareTo("Slobodan")== 0) {
                     		pacijent = new JLabel("/");
                     	} else {
                         	pacijent = new JLabel(DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getPacijent().getKorisnickoIme());
@@ -885,7 +912,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 									DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setPacijent(k);
 									DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setStatus(Status.Zakazan);
 									DomZdravlja.sacuvaj();
-									model.removeRow(izabranRed);
+									model3.removeRow(izabranRed);
 									frameInfoTermin.dispose();
 									setEnabled(true);
 									setVisible(true);
@@ -938,7 +965,7 @@ public class PocetnaStranicaPacijent extends JFrame{
 				
 			}});
 		
-		sorter = new TableRowSorter<>(model);
+		sorter = new TableRowSorter<>(model3);
 		tabela.setRowSorter(sorter);
 		
 		sorter.setComparator(0, new Comparator<String>() {
@@ -957,10 +984,10 @@ public class PocetnaStranicaPacijent extends JFrame{
 		JScrollPane scrollPane = new JScrollPane(tabela);
 		
 		int i = 0;
-		int velicina = model.getRowCount();
+		int velicina = model3.getRowCount();
 		while (i < velicina) {
-			if (model.getValueAt(i, 0) == null) {
-				model.removeRow(i);
+			if (model3.getValueAt(i, 0) == null) {
+				model3.removeRow(i);
 				velicina -= 1;
 			} else {
 				i++;

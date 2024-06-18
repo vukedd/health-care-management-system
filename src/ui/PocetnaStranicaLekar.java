@@ -46,7 +46,7 @@ public class PocetnaStranicaLekar extends JFrame{
 	private JFrame frameTermin;
 	
 	private DefaultTableModel model1;
-	private JTable tabela;
+	private JTable tabela1;
 	private int izabranRed;
 	private JScrollPane tblTermini;
 	private JFrame frameInfoTermin;
@@ -54,11 +54,13 @@ public class PocetnaStranicaLekar extends JFrame{
 	private  JButton btnDodajTerapiju;
 	private JFrame frameEditTermin;
 	
+	private JTable tabela2;
 	private JFrame frameInfoTerapija;
 	private JFrame frameIzmenaTerapija;
 	private JFrame frameDodajTerapiju;
 	private int indexTerapijeZaPrikaz;
 	
+	private JTable tabela3;
 	private JFrame frameIntervalIzvestaj;
 	private JTextField filterField;
 	private JLabel lblPretraga;
@@ -147,13 +149,14 @@ public class PocetnaStranicaLekar extends JFrame{
                 if (text.trim().length() == 0) {
                     izvestajSorter.setRowFilter(null);
                 } else {
-                    izvestajSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    izvestajSorter.setRowFilter(RowFilter.regexFilter(".*" + text));
                 }
             }
         });
 		lblPretraga = new JLabel("Pretraži Termine: ");
 		
 		btnPocetna = new JButton(new ImageIcon("img/homepage.png"));
+		btnPocetna.setFocusPainted(false);
 		btnPocetna.addActionListener(new ActionListener() {
 
 			@Override
@@ -249,7 +252,7 @@ public class PocetnaStranicaLekar extends JFrame{
 							i++;
 						}
 						
-						if (i == pacijenti.getSize() && t.getPacijent() != null) {
+						if (i == pacijenti.getSize() && t.getPacijent() != null && t.getPacijent().getAktivan() == true) {
 							pacijenti.addElement(t.getPacijent().getKorisnickoIme());
 						}
 					}
@@ -360,7 +363,7 @@ public class PocetnaStranicaLekar extends JFrame{
 								JOptionPane.showMessageDialog(frameZakazi, "Odabrani termin već postoji!", "Obaveštenje", JOptionPane.WARNING_MESSAGE);
 							}
 			            } else {
-			            	JOptionPane.showMessageDialog(frameInfoTermin, "Molim vas popunite sva polja!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
+			            	JOptionPane.showMessageDialog(frameInfoTermin, "Molim vas popunite sva polja!", "Obaveštenje", JOptionPane.WARNING_MESSAGE);
 			            }
 						
 					}});
@@ -381,65 +384,6 @@ public class PocetnaStranicaLekar extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setEnabled(false);
-				
-				frameDodajTerapiju = new JFrame();
-				frameDodajTerapiju.setSize(500,600);
-				frameDodajTerapiju.setLocationRelativeTo(PocetnaStranicaLekar.this);
-				frameDodajTerapiju.setVisible(true);
-				frameDodajTerapiju.setLayout(new MigLayout());
-				frameDodajTerapiju.addWindowListener(new WindowListener() {
-
-					@Override
-					public void windowOpened(WindowEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void windowClosing(WindowEvent e) {
-							setEnabled(true);
-							setVisible(true);
-					}
-
-					@Override
-					public void windowClosed(WindowEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void windowIconified(WindowEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void windowDeiconified(WindowEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void windowActivated(WindowEvent e) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void windowDeactivated(WindowEvent e) {
-						// TODO Auto-generated method stub
-						
-					}});
-				
-            	JLabel lblTerapijeDodaj = new JLabel("Dodaj terapiju");
-            	lblTerapijeDodaj.setFont(new Font("Bold", Font.PLAIN, 30));
-            	lblTerapijeDodaj.setHorizontalAlignment(SwingUtilities.CENTER);
-            	
-            	JLabel idTerapije = new JLabel("ID Terapije: ");
-            	idTerapije.setFont(new Font("Bold", Font.PLAIN, 15));
-            	JLabel ID = new JLabel(String.valueOf(DomZdravlja.getTerapije().get(DomZdravlja.getTerapije().size() - 1).getId() + 1));
-            	
             	JLabel pacijentTerapije = new JLabel("Prepisano pacijentu: ");
             	pacijentTerapije.setFont(new Font("Bold", Font.PLAIN, 15));
             	DefaultComboBoxModel<String> pacijenti = new DefaultComboBoxModel<String>();
@@ -453,7 +397,7 @@ public class PocetnaStranicaLekar extends JFrame{
 							i++;
 						}
 						
-						if (i == pacijenti.getSize() && t.getPacijent() != null) {
+						if (i == pacijenti.getSize() && t.getPacijent() != null && t.getPacijent().getAktivan() == true) {
 							pacijenti.addElement(t.getPacijent().getKorisnickoIme());
 						}
 					}
@@ -461,58 +405,121 @@ public class PocetnaStranicaLekar extends JFrame{
 				JComboBox cmbPacijenti = new JComboBox(pacijenti);
 				cmbPacijenti.setSelectedItem(DomZdravlja.getTerapije().get(indexTerapijeZaPrikaz).getzKarton().getPacijent().getKorisnickoIme());
 				
-            	JLabel opisTerapije = new JLabel("Opis Terapije: ");
-            	opisTerapije.setFont(new Font("Bold", Font.PLAIN, 15));
-            	JTextArea opisEdit = new JTextArea();
-            	opisEdit.setPreferredSize(new Dimension(200, 200));
-            	
-            	JButton potvrdiKreiraj = new JButton("Kreiraj");
-            	potvrdiKreiraj.addActionListener(new ActionListener() {
+				
+				if (cmbPacijenti.getItemCount() != 0) {
+					setEnabled(false);
+					frameDodajTerapiju = new JFrame();
+					frameDodajTerapiju.setSize(500,600);
+					frameDodajTerapiju.setLocationRelativeTo(PocetnaStranicaLekar.this);
+					frameDodajTerapiju.setVisible(true);
+					frameDodajTerapiju.setLayout(new MigLayout());
+					frameDodajTerapiju.addWindowListener(new WindowListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						int id = DomZdravlja.getTerapije().get(DomZdravlja.getTerapije().size() - 1).getId() + 5;
-						String opisTerapije = opisEdit.getText();
-						Lekar lekar = (Lekar)korisnik;
-						ZdravstveniKarton zKarton = null;
-						Pacijent p = null;
-						for (Korisnik k: DomZdravlja.getKorisnici()) {
-							if (k.getKorisnickoIme().compareTo(cmbPacijenti.getSelectedItem().toString()) == 0) {
-								p = (Pacijent)k;
-								zKarton = p.getzKarton();
+						@Override
+						public void windowOpened(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void windowClosing(WindowEvent e) {
+								setEnabled(true);
+								setVisible(true);
+						}
+
+						@Override
+						public void windowClosed(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void windowIconified(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void windowDeiconified(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void windowActivated(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void windowDeactivated(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}});
+					
+	            	JLabel lblTerapijeDodaj = new JLabel("Dodaj terapiju");
+	            	lblTerapijeDodaj.setFont(new Font("Bold", Font.PLAIN, 30));
+	            	lblTerapijeDodaj.setHorizontalAlignment(SwingUtilities.CENTER);
+	            	
+	            	JLabel idTerapije = new JLabel("ID Terapije: ");
+	            	idTerapije.setFont(new Font("Bold", Font.PLAIN, 15));
+	            	JLabel ID = new JLabel(String.valueOf(DomZdravlja.getTerapije().get(DomZdravlja.getTerapije().size() - 1).getId() + 5));
+	        
+	            	JLabel opisTerapije = new JLabel("Opis Terapije: ");
+	            	opisTerapije.setFont(new Font("Bold", Font.PLAIN, 15));
+	            	JTextArea opisEdit = new JTextArea();
+	            	opisEdit.setPreferredSize(new Dimension(200, 200));
+	            	opisEdit.setMaximumSize(new Dimension(200, 200));
+	            	
+	            	JButton potvrdiKreiraj = new JButton("Kreiraj");
+	            	potvrdiKreiraj.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int id = DomZdravlja.getTerapije().get(DomZdravlja.getTerapije().size() - 1).getId() + 5;
+							String opisTerapije = opisEdit.getText();
+							Lekar lekar = (Lekar)korisnik;
+							ZdravstveniKarton zKarton = null;
+							Pacijent p = null;
+							for (Korisnik k: DomZdravlja.getKorisnici()) {
+								if (k.getKorisnickoIme().compareTo(cmbPacijenti.getSelectedItem().toString()) == 0) {
+									p = (Pacijent)k;
+									zKarton = p.getzKarton();
+								}
+							}
+							
+							
+							
+							if (opisTerapije.compareTo("") != 0) {
+								Terapija t = new Terapija(id, opisTerapije, lekar, zKarton);
+								DomZdravlja.getTerapije().add(t);
+								JOptionPane.showMessageDialog(frameDodajTerapiju, "Uspešno ste dodelili terapiju!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
+								model1.addRow(new Object[] {id, lekar.getKorisnickoIme(), zKarton.getPacijent().getKorisnickoIme(), "..."});
+								frameDodajTerapiju.dispose();
+								DomZdravlja.sacuvaj();
+								setEnabled(true);
+								setVisible(true);
+							} else {
+								JOptionPane.showMessageDialog(frameDodajTerapiju, "Greška prilikom kreiranja terapije", "Upozorenje", JOptionPane.WARNING_MESSAGE);
 							}
 						}
-						
-						
-						
-						if (opisTerapije.compareTo("") != 0) {
-							Terapija t = new Terapija(id, opisTerapije, lekar, zKarton);
-							DomZdravlja.getTerapije().add(t);
-							JOptionPane.showMessageDialog(frameDodajTerapiju, "Uspešno ste dodelili terapiju!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
-							model1.addRow(new Object[] {id, lekar.getKorisnickoIme(), zKarton.getPacijent().getKorisnickoIme(), "..."});
-							frameDodajTerapiju.dispose();
-							DomZdravlja.sacuvaj();
-							setEnabled(true);
-							setVisible(true);
-						} else {
-							JOptionPane.showMessageDialog(frameDodajTerapiju, "Greška prilikom kreiranja terapije", "Upozorenje", JOptionPane.WARNING_MESSAGE);
-						}
-					}
-            		
-            	});
-            	
-            	frameDodajTerapiju.add(lblTerapijeDodaj, "gap 140,wrap");
-            	frameDodajTerapiju.add(idTerapije, "gap 100");
-            	frameDodajTerapiju.add(ID, "wrap");
-            	frameDodajTerapiju.add(pacijentTerapije, "gap 100");
-            	frameDodajTerapiju.add(cmbPacijenti, "wrap");
-            	frameDodajTerapiju.add(opisTerapije, "gap 100,wrap");
-            	frameDodajTerapiju.add(opisEdit, "gap 100, wrap");
-            	frameDodajTerapiju.add(potvrdiKreiraj, "gap 210");
+	            		
+	            	});
+	            	
+	            	frameDodajTerapiju.add(lblTerapijeDodaj, "gap 140,wrap");
+	            	frameDodajTerapiju.add(idTerapije, "gap 100");
+	            	frameDodajTerapiju.add(ID, "wrap");
+	            	frameDodajTerapiju.add(pacijentTerapije, "gap 100");
+	            	frameDodajTerapiju.add(cmbPacijenti, "wrap");
+	            	frameDodajTerapiju.add(opisTerapije, "gap 100,wrap");
+	            	frameDodajTerapiju.add(opisEdit, "gap 100, wrap");
+	            	frameDodajTerapiju.add(potvrdiKreiraj, "gap 210");
+					
+				} else {
+					JOptionPane.showMessageDialog(PocetnaStranicaLekar.this, "Nema evidentiranih pacijenata!", "Obaveštenje", JOptionPane.WARNING_MESSAGE);
+				}
 				
-			}
-			
-		});
+			}});
 		
 		tBarLekar = new JToolBar();
 		tBarLekar.setLayout(new MigLayout("insets 0"));
@@ -808,16 +815,16 @@ public class PocetnaStranicaLekar extends JFrame{
 		}
 	
 		model1 = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model1);
+		tabela1 = new JTable(model1);
 		
-		tabela.setRowSelectionAllowed(true);
+		tabela1.setRowSelectionAllowed(true);
 
-		tabela.setColumnSelectionAllowed(false);
+		tabela1.setColumnSelectionAllowed(false);
 
-		tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tabela1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		tabela.setDefaultEditor(Object.class, null);
-		tabela.addMouseListener(new MouseListener() {
+		tabela1.setDefaultEditor(Object.class, null);
+		tabela1.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -940,7 +947,7 @@ public class PocetnaStranicaLekar extends JFrame{
 							}});
                     	
                     	JButton izmeniTermin = new JButton("Izmeni Termin");
-                    	if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getDatumTermina().isAfter(LocalDateTime.now()) && DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() == Status.Zakazan || DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() == Status.Slobodan) {
+                    	if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getDatumTermina().isAfter(LocalDateTime.now()) && (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() == Status.Zakazan || DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() == Status.Slobodan)) {
                     		izmeniTermin.setEnabled(true);
                     	} 
                     	else {
@@ -1022,13 +1029,13 @@ public class PocetnaStranicaLekar extends JFrame{
 											i++;
 										}
 										
-										if (i == pacijenti.getSize() && t.getPacijent() != null) {
+										if (i == pacijenti.getSize() && t.getPacijent() != null && t.getPacijent().getAktivan() == true) {
 											pacijenti.addElement(t.getPacijent().getKorisnickoIme());
 										}
 									}
 								}
 								JComboBox cmbPacijenti = new JComboBox(pacijenti);
-								if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getPacijent() != null) {
+								if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getStatus() != Status.Slobodan) {
 									cmbPacijenti.setSelectedItem(DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getPacijent().getKorisnickoIme());
 								} else {
 									cmbPacijenti.setSelectedIndex(0);
@@ -1069,11 +1076,15 @@ public class PocetnaStranicaLekar extends JFrame{
 										} else {
 											s = Status.Zakazan;
 										} 						
-
-										for (Korisnik k: DomZdravlja.getKorisnici()) {
-											if (k.getKorisnickoIme().compareTo((String) cmbPacijenti.getSelectedItem()) == 0) {
-												p = (Pacijent)k;
-												System.out.println(p.getKorisnickoIme());
+										
+										if (s == Status.Slobodan) {
+											p = null;
+										} else {
+											for (Korisnik k: DomZdravlja.getKorisnici()) {
+												if (k.getKorisnickoIme().compareTo((String) cmbPacijenti.getSelectedItem()) == 0) {
+													p = (Pacijent)k;
+													System.out.println(p.getKorisnickoIme());
+												}
 											}
 										}
 										Lekar l = (Lekar)korisnik;
@@ -1092,9 +1103,8 @@ public class PocetnaStranicaLekar extends JFrame{
 								                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setDatumTermina(datumTermina);
 								                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setPacijent(p);
 								                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setStatus(s);
-								                DomZdravlja.sacuvaj();
+								                System.out.println(DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getId());
 												JOptionPane.showMessageDialog(PocetnaStranicaLekar.this, "Uspešno ste ažurirali termin!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
-//												JOptionPane.showMessageDialog(PocetnaStranicaLekar.this, "Uspešno ste zakazali termin!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 												DomZdravlja.sacuvaj();
 								                model1.setValueAt(p.getKorisnickoIme().toString(), izabranRed, 1);
 								                model1.setValueAt(s.toString(), izabranRed, 2);
@@ -1104,7 +1114,7 @@ public class PocetnaStranicaLekar extends JFrame{
 												setVisible(true);
 												setEnabled(true);		
 							                } else {
-							                	JOptionPane.showMessageDialog(frameInfoTermin, "Molim vas odaberite predstojeći datum!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
+							                	JOptionPane.showMessageDialog(frameInfoTermin, "Molim vas odaberite predstojeći datum!", "Obaveštenje", JOptionPane.WARNING_MESSAGE);
 							                }								
 							            } else if (selectedDate != null && p == null && s == Status.Slobodan) {
 							                SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy.");
@@ -1112,8 +1122,14 @@ public class PocetnaStranicaLekar extends JFrame{
 							                datumTermina = LocalDateTime.parse(formatiraniDatum, DATE_TIME_FORMATTER);
 							                if (datumTermina.isAfter(LocalDateTime.now())) {
 								                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setDatumTermina(datumTermina);
-								                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setPacijent(null);
-								                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setStatus(s);
+								                if (DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getPacijent() != null) {
+								                	
+								                	DomZdravlja.getTermini().get(indexTerminaZaPrikaz).getPacijent().getzKarton().getTermini().remove(DomZdravlja.getTermini().get(indexTerminaZaPrikaz));
+								                	DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setPacijent(p);
+									                DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setStatus(Status.Slobodan);
+								                } else {
+								                	DomZdravlja.getTermini().get(indexTerminaZaPrikaz).setStatus(Status.Slobodan);
+								                }
 												DomZdravlja.sacuvaj();
 												JOptionPane.showMessageDialog(PocetnaStranicaLekar.this, "Uspešno ste ažurirali termin!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 								                model1.setValueAt("/", izabranRed, 1);
@@ -1188,7 +1204,7 @@ public class PocetnaStranicaLekar extends JFrame{
 				
 			}});
 		
-		JScrollPane scrollPane = new JScrollPane(tabela);
+		JScrollPane scrollPane = new JScrollPane(tabela1);
 		
 		int i = 0;
 		int velicina = model1.getRowCount();
@@ -1241,19 +1257,19 @@ public class PocetnaStranicaLekar extends JFrame{
 		}
 	
 		model1 = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model1);
+		tabela2 = new JTable(model1);
 		
-		tabela.setRowSelectionAllowed(true);
+		tabela2.setRowSelectionAllowed(true);
 
-		tabela.setColumnSelectionAllowed(false);
+		tabela2.setColumnSelectionAllowed(false);
 
-		tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tabela2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		tabela.setDefaultEditor(Object.class, null);
+		tabela2.setDefaultEditor(Object.class, null);
 		
-		JScrollPane scrollPane = new JScrollPane(tabela);
+		JScrollPane scrollPane = new JScrollPane(tabela2);
 		
-		tabela.addMouseListener(new MouseListener() {
+		tabela2.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -1420,7 +1436,7 @@ public class PocetnaStranicaLekar extends JFrame{
 		        							i++;
 		        						}
 		        						
-		        						if (i == pacijenti.getSize() && t.getPacijent() != null) {
+		        						if (i == pacijenti.getSize() && t.getPacijent() != null && t.getPacijent().getAktivan() == true) {
 		        							pacijenti.addElement(t.getPacijent().getKorisnickoIme());
 		        						}
 		        					}
@@ -1584,21 +1600,20 @@ public class PocetnaStranicaLekar extends JFrame{
 					}
 				} else {
 					redovi.add(i);
-					System.out.println(i);
 				}
 			}
 	
 			model2 = new DefaultTableModel(sadrzaj, zaglavlja);
-			tabela = new JTable(model2);
+			tabela3 = new JTable(model2);
 			
-			tabela.setRowSelectionAllowed(true);
+			tabela3.setRowSelectionAllowed(true);
 	
-			tabela.setColumnSelectionAllowed(false);
+			tabela3.setColumnSelectionAllowed(false);
 	
-			tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			tabela3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	
-			tabela.setDefaultEditor(Object.class, null);
-			tabela.addMouseListener(new MouseListener() {
+			tabela3.setDefaultEditor(Object.class, null);
+			tabela3.addMouseListener(new MouseListener() {
 	
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -1970,7 +1985,7 @@ public class PocetnaStranicaLekar extends JFrame{
 				}});
 			
 			izvestajSorter = new TableRowSorter<>(model2);
-			tabela.setRowSorter(izvestajSorter);
+			tabela3.setRowSorter(izvestajSorter);
 			
 			izvestajSorter.setComparator(0, new Comparator<String>() {
 	            @Override
@@ -1985,7 +2000,7 @@ public class PocetnaStranicaLekar extends JFrame{
 	            }
 	        });
 			
-			JScrollPane scrollPane = new JScrollPane(tabela);
+			JScrollPane scrollPane = new JScrollPane(tabela3);
 			
 			int i = 0;
 			int velicina = model2.getRowCount();

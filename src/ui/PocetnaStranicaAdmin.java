@@ -24,7 +24,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 	
 	private JScrollPane tblTermini;
 	private JTable tabela;
-	private DefaultTableModel model;
+	private DefaultTableModel model4;
 	private int izabranRed;
 	private JFrame frameInfoTermin;
 	private int indexKorisnikaZaPrikaz;
@@ -217,12 +217,32 @@ public class PocetnaStranicaAdmin extends JFrame{
 				
 				JLabel lblJMBGReg = new JLabel("JMBG:");
 				JTextField txtFJMBG = new JTextField(15);
+				txtFJMBG.addKeyListener(new KeyAdapter() {
+		            @Override
+		            public void keyTyped(KeyEvent e) {
+		                char c = e.getKeyChar();
+		                // Check if the character is not a digit
+		                if (!Character.isDigit(c)) {
+		                    e.consume(); // Ignore the event if it's not a digit
+		                }
+		            }
+		        });
 				
 				JLabel lblAdresaReg = new JLabel("Adresa:");
 				JTextField txtFAdresa = new JTextField(15);
 				
 				JLabel lblBrojTelReg = new JLabel("Broj telefona:");
 				JTextField txtFBrojTel = new JTextField(15);
+				txtFBrojTel.addKeyListener(new KeyAdapter() {
+		            @Override
+		            public void keyTyped(KeyEvent e) {
+		                char c = e.getKeyChar();
+		                // Check if the character is not a digit
+		                if (!Character.isDigit(c)) {
+		                    e.consume(); // Ignore the event if it's not a digit
+		                }
+		            }
+		        });
 				
 				JButton registruj = new JButton("Registruj");
 				registruj.addActionListener(new ActionListener() {
@@ -239,7 +259,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 						String prezime = txtFPrezime.getText();
 						Pol pol = Pol.values()[boxPol.getSelectedIndex()];
 						String jMBG = txtFJMBG.getText();
-						String adresa = txtFPrezime.getText();
+						String adresa = txtFAdresa.getText();
 						String brTel = txtFBrojTel.getText();
 						String datumPre = LocalDateTime.now().format(DATE_TIME_FORMATTER);
 						LocalDateTime datum = LocalDateTime.parse(datumPre, DATE_TIME_FORMATTER);
@@ -250,7 +270,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 									Admin a = new Admin(id, kIme, lozinka, ime, prezime, jMBG,pol, adresa, brTel, uloga, datum, true);
 									DomZdravlja.getKorisnici().add(a);
 									JOptionPane.showMessageDialog(register, "Korisnik Uspešno registrovan!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
-									model.addRow(new Object[]{id, kIme, ime, prezime, jMBG, pol, brTel, uloga});
+									model4.addRow(new Object[]{id, kIme, ime, prezime, jMBG, pol, brTel, uloga});
 									DomZdravlja.sacuvaj();
 									setEnabled(true);
 									register.dispose();
@@ -260,7 +280,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 									Lekar l = new Lekar(id, kIme, lozinka, ime, prezime, jMBG,pol, adresa, brTel, uloga, datum, true);
 									DomZdravlja.getKorisnici().add(l);
 									JOptionPane.showMessageDialog(register, "Korisnik Uspešno registrovan!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
-									model.addRow(new Object[]{id, kIme, ime, prezime, jMBG, pol, brTel, uloga});
+									model4.addRow(new Object[]{id, kIme, ime, prezime, jMBG, pol, brTel, uloga});
 									DomZdravlja.sacuvaj();
 									setEnabled(true);
 									register.dispose();
@@ -269,12 +289,12 @@ public class PocetnaStranicaAdmin extends JFrame{
 								if (uloga == Uloga.PACIJENT) {
 									Pacijent p = new Pacijent(id, kIme, lozinka, ime, prezime, jMBG,pol, adresa, brTel, uloga, datum, null, true);
 									int idKart = DomZdravlja.getZdravstveniKartoni().size();
-									ZdravstveniKarton zKartonP = new ZdravstveniKarton(DomZdravlja.getZdravstveniKartoni().get(idKart - 1).getId() + 1,p, true);
+									ZdravstveniKarton zKartonP = new ZdravstveniKarton(DomZdravlja.getZdravstveniKartoni().get(idKart - 1).getId() + 10,p, true);
 									p.setzKarton(zKartonP);
 									DomZdravlja.getKorisnici().add(p);
 									DomZdravlja.getZdravstveniKartoni().add(zKartonP);
 									JOptionPane.showMessageDialog(register, "Korisnik Uspešno registrovan!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
-									model.addRow(new Object[]{id, kIme, ime, prezime, jMBG, pol, brTel, uloga});
+									model4.addRow(new Object[]{id, kIme, ime, prezime, jMBG, pol, brTel, uloga});
 									DomZdravlja.sacuvaj();
 									setEnabled(true);
 									register.dispose();
@@ -459,8 +479,8 @@ public class PocetnaStranicaAdmin extends JFrame{
 			}
 		}
 		
-		model = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model);
+		model4 = new DefaultTableModel(sadrzaj, zaglavlja);
+		tabela = new JTable(model4);
 
 		tabela.setRowSelectionAllowed(true);
 
@@ -535,7 +555,7 @@ public class PocetnaStranicaAdmin extends JFrame{
                     	
                     	indexKartonaZaPrikaz = 0;
                     	for (ZdravstveniKarton kt: DomZdravlja.getZdravstveniKartoni()) {
-                    		if (kt.getId() == Integer.parseInt(model.getValueAt(izabranRed, 0).toString())) {
+                    		if (kt.getId() == Integer.parseInt(model4.getValueAt(izabranRed, 0).toString())) {
                     			break;
                     		}
                     		indexKartonaZaPrikaz += 1;
@@ -544,7 +564,7 @@ public class PocetnaStranicaAdmin extends JFrame{
                     	JPanel pnlKartonInfo = new JPanel();
                     	pnlKartonInfo.setLayout(new MigLayout());
                     	
-                    	JLabel idKartona = new JLabel("ID Termina: ");
+                    	JLabel idKartona = new JLabel("ID Kartona: ");
                     	idKartona.setFont(new Font("Bold", Font.PLAIN, 15));
                     	JLabel ID = new JLabel(Integer.toString(DomZdravlja.getZdravstveniKartoni().get(indexKartonaZaPrikaz).getId()));
                     	
@@ -663,10 +683,10 @@ public class PocetnaStranicaAdmin extends JFrame{
 		JScrollPane scrollPane = new JScrollPane(tabela);
 		
 		int i = 0;
-		int velicina = model.getRowCount();
+		int velicina = model4.getRowCount();
 		while (i < velicina) {
-			if (model.getValueAt(i, 0) == null) {
-				model.removeRow(i);
+			if (model4.getValueAt(i, 0) == null) {
+				model4.removeRow(i);
 				velicina -= 1;
 			} else {
 				i++;
@@ -689,7 +709,6 @@ public class PocetnaStranicaAdmin extends JFrame{
 			e.printStackTrace();
 		}
 		
-		//Sadrzaj tabele[brojRedova][brojKolona]
 		Object[][] sadrzaj = new Object[korisniciLn.size()][zaglavlja.length];
 
 		
@@ -709,8 +728,8 @@ public class PocetnaStranicaAdmin extends JFrame{
 			}
 		}
 		
-		model = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model);
+		model4 = new DefaultTableModel(sadrzaj, zaglavlja);
+		tabela = new JTable(model4);
 
 		tabela.setRowSelectionAllowed(true);
 
@@ -780,7 +799,7 @@ public class PocetnaStranicaAdmin extends JFrame{
                     	
                     	indexKorisnikaZaPrikaz = 0;
                     	for (Korisnik k: DomZdravlja.getKorisnici()) {
-                    		if (k.getId() == Integer.parseInt(model.getValueAt(izabranRed, 0).toString())) {
+                    		if (k.getId() == Integer.parseInt(model4.getValueAt(izabranRed, 0).toString())) {
                     			break;
                     		}
                     		indexKorisnikaZaPrikaz += 1;
@@ -921,6 +940,16 @@ public class PocetnaStranicaAdmin extends JFrame{
 		                    	jMBGKorisnika.setFont(new Font("Bold", Font.PLAIN, 15));
 		                    	JTextField jmbg = new JTextField(20);
 		                    	jmbg.setText(DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).getJMBG());
+		        				jmbg.addKeyListener(new KeyAdapter() {
+		        		            @Override
+		        		            public void keyTyped(KeyEvent e) {
+		        		                char c = e.getKeyChar();
+		        		                // Check if the character is not a digit
+		        		                if (!Character.isDigit(c)) {
+		        		                    e.consume(); // Ignore the event if it's not a digit
+		        		                }
+		        		            }
+		        		        });
 		                    
 		                    	JLabel adresaKorisnika = new JLabel("Adresa: ");
 		                    	adresaKorisnika.setFont(new Font("Bold", Font.PLAIN, 15));
@@ -931,6 +960,16 @@ public class PocetnaStranicaAdmin extends JFrame{
 		                    	brojKorisnika.setFont(new Font("Bold", Font.PLAIN, 15));
 		                    	JTextField broj = new JTextField(20);
 		                    	broj.setText(DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).getBrojTelefona());
+		        				broj.addKeyListener(new KeyAdapter() {
+		        		            @Override
+		        		            public void keyTyped(KeyEvent e) {
+		        		                char c = e.getKeyChar();
+		        		                // Check if the character is not a digit
+		        		                if (!Character.isDigit(c)) {
+		        		                    e.consume(); // Ignore the event if it's not a digit
+		        		                }
+		        		            }
+		        		        });
 		                    	
 		                    	JButton btnAzurirajKorisnika = new JButton("Ažuriraj");
 		                    	btnAzurirajKorisnika.addActionListener(new ActionListener() {
@@ -956,12 +995,12 @@ public class PocetnaStranicaAdmin extends JFrame{
 											k.setBrojTelefona(newBrojTel);
 											DomZdravlja.sacuvaj();
 											
-											model.setValueAt(newKorisnickoIme, izabranRed, 1);
-											model.setValueAt(newImeKorisnika, izabranRed, 2);
-											model.setValueAt(newPrezimeKorisnika, izabranRed, 3);
-											model.setValueAt(newPol.toString(), izabranRed, 5);
-											model.setValueAt(newjmbg, izabranRed, 4);
-											model.setValueAt(newBrojTel, izabranRed, 6);
+											model4.setValueAt(newKorisnickoIme, izabranRed, 1);
+											model4.setValueAt(newImeKorisnika, izabranRed, 2);
+											model4.setValueAt(newPrezimeKorisnika, izabranRed, 3);
+											model4.setValueAt(newPol.toString(), izabranRed, 5);
+											model4.setValueAt(newjmbg, izabranRed, 4);
+											model4.setValueAt(newBrojTel, izabranRed, 6);
 											JOptionPane.showMessageDialog(frameEditKorisnik, "Izmene su sačuvane!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 											frameEditKorisnik.dispose();
 											frameInfoKorisnik.dispose();
@@ -1015,7 +1054,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								int a =JOptionPane.showConfirmDialog(pnlInfoKorisnik, "Da li ste sigurni da želite da obrišete korisnika " + DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).getKorisnickoIme() + "?", "Potvrda", JOptionPane.OK_CANCEL_OPTION);
+								int a = JOptionPane.showConfirmDialog(pnlInfoKorisnik, "Da li ste sigurni da želite da obrišete korisnika " + DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).getKorisnickoIme() + "?", "Potvrda", JOptionPane.OK_CANCEL_OPTION);
 								if (a == JOptionPane.OK_OPTION) {
 										if (DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).getUloga() == Uloga.LEKAR) {
 											ArrayList<Termin> zakazaniTermini = new ArrayList<Termin>();
@@ -1030,7 +1069,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 												JOptionPane.showMessageDialog(pnlInfoKorisnik, "Ne možete obrisati lekara koji ima zakazane termine!", "Upozorenje", JOptionPane.WARNING_MESSAGE);
 											} else {
 												DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).setAktivan(false);
-												model.removeRow(izabranRed);
+												model4.removeRow(izabranRed);
 												JOptionPane.showMessageDialog(pnlInfoKorisnik, "Uspešno ste obrisali korisnika!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 												frameInfoKorisnik.dispose();
 												setEnabled(true);
@@ -1053,7 +1092,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 												Pacijent p1 = (Pacijent)DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz);
 												p1.setAktivan(false);
 												p1.getzKarton().setAktivan(false);
-												model.removeRow(izabranRed);
+												model4.removeRow(izabranRed);
 												JOptionPane.showMessageDialog(pnlInfoKorisnik, "Uspešno ste obrisali korisnika!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 												frameInfoKorisnik.dispose();
 												setEnabled(true);
@@ -1063,7 +1102,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 										}
 										if (DomZdravlja.getKorisnici().get(indexKorisnikaZaPrikaz).getUloga() == Uloga.ADMIN) {
 											DomZdravlja.getKorisnici().remove(indexKorisnikaZaPrikaz);
-											model.removeRow(izabranRed);
+											model4.removeRow(izabranRed);
 											JOptionPane.showMessageDialog(pnlInfoKorisnik, "Uspešno ste obrisali korisnika!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 											frameInfoKorisnik.dispose();
 											setEnabled(true);
@@ -1129,10 +1168,10 @@ public class PocetnaStranicaAdmin extends JFrame{
 		JScrollPane scrollPane = new JScrollPane(tabela);
 		
 		int i = 0;
-		int velicina = model.getRowCount();
+		int velicina = model4.getRowCount();
 		while (i < velicina) {
-			if (model.getValueAt(i, 0) == null) {
-				model.removeRow(i);
+			if (model4.getValueAt(i, 0) == null) {
+				model4.removeRow(i);
 				velicina -= 1;
 			} else {
 				i++;
@@ -1413,7 +1452,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 					}
 				}
 			} else {
-				sadrzaj[i][1] = " ";
+				sadrzaj[i][1] = "/";
 			}
 			
 			for (Korisnik k : DomZdravlja.getKorisnici()) {
@@ -1427,8 +1466,8 @@ public class PocetnaStranicaAdmin extends JFrame{
 			sadrzaj[i][4] = LocalDateTime.parse(info[4], DATE_TIME_FORMATTER);
 			}
 		
-		model = new DefaultTableModel(sadrzaj, zaglavlja);
-		tabela = new JTable(model);
+		model4 = new DefaultTableModel(sadrzaj, zaglavlja);
+		tabela = new JTable(model4);
 
 		tabela.setRowSelectionAllowed(true);
 
@@ -1503,7 +1542,7 @@ public class PocetnaStranicaAdmin extends JFrame{
                     	
                     	indexTerminaZaPrikaz = 0;
                     	for (Termin t: DomZdravlja.getTermini()) {
-                    		if (t.getId() == Integer.parseInt(model.getValueAt(izabranRed, 0).toString())) {
+                    		if (t.getId() == Integer.parseInt(model4.getValueAt(izabranRed, 0).toString())) {
                     			break;
                     		}
                     		indexTerminaZaPrikaz += 1;
@@ -1554,7 +1593,7 @@ public class PocetnaStranicaAdmin extends JFrame{
 												}
 											}
 											setEnabled(true);
-											model.setValueAt("Otkazan", izabranRed, 3);
+											model4.setValueAt("Otkazan", izabranRed, 3);
 											JOptionPane.showMessageDialog(frameInfoTermin, "Termin je uspešno otkazan!", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
 											DomZdravlja.sacuvaj();
 											frameInfoTermin.dispose();

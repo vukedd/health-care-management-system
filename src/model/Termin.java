@@ -61,7 +61,12 @@ public class Termin {
 			pacijent.zKarton.getTermini().add(this);
 		}
 		else {
-			pacijent = null;
+			if (this.pacijent != null) {
+				this.pacijent.zKarton.getTermini().remove(this);
+				this.pacijent = null;
+			} else {
+			this.pacijent = null;
+			}
 		}
 	}
 

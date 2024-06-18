@@ -301,7 +301,6 @@ public class DomZdravlja {
 						 linije.add(linija);
 			}
 		}
-		System.out.println(linije.toString());
 		Files.write(TERMINI_PUTANJA, linije);
 	}
 	
@@ -345,7 +344,7 @@ public class DomZdravlja {
 	
 	public static boolean korisnickoImeCheck(String korisnickoIme) {
 		for (Korisnik k: korisnici) {
-			if (k.getKorisnickoIme().compareTo(korisnickoIme) == 0 && k.getAktivan() == true) {
+			if (k.getKorisnickoIme().compareTo(korisnickoIme) == 0) {
 				return false;
 			}
 		}
